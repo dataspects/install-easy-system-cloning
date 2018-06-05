@@ -1,0 +1,11 @@
+---
+
+- include_tasks: tasks/user-agnostic/install-gnupg.yml
+- include_tasks: tasks/user-agnostic/install-mysqldump.yml
+
+- include_tasks: tasks/user-specific/snapshot-target-interfaces/install-dropbox.yml
+
+- include_tasks: tasks/user-specific/configuration/configure-gpg-keys.yml
+- include_tasks: tasks/user-specific/configuration/configure-database-snapshots.yml
+- include_tasks: tasks/user-specific/configuration/configure-duplicity-snapshots.yml
+- include_tasks: tasks/user-specific/configuration/configure-cronjob.yml

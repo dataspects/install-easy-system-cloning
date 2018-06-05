@@ -1,0 +1,13 @@
+[Unit]
+Description=Dropbox Daemon
+After=network.target
+
+[Service]
+Type=simple
+User={{ ansible_env.USER }}
+ExecStart=/opt/dropbox/dropboxd
+ExecStop=/bin/kill -HUP $MAINPID
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

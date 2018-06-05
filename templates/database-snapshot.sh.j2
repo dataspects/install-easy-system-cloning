@@ -1,0 +1,14 @@
+#!/bin/bash
+
+mysqldump \
+--password=${SMW_MYSQL_PASSWORD} \
+--user=${SMW_MYSQL_USER} \
+--host=${SMW_MYSQL_HOST} \
+--complete-insert \
+--add-drop-database \
+--add-drop-table \
+--compact \
+--create-options \
+--no-create-db \
+--result-file=${SMW_DUMPFILE} \
+${SMW_MYSQL_DATABASE}

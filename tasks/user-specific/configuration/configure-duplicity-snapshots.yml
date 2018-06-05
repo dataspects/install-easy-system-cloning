@@ -1,0 +1,5 @@
+- name: Install duplicity-snapshot.sh
+  template:
+    src: templates/duplicity-snapshot.j2
+    dest: {{ ansible_env.USER }}/duplicity-snapshot.sh
+    mode: 0700

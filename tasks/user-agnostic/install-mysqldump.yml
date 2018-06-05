@@ -1,0 +1,20 @@
+---
+
+- name: Check if Mysqldump is installed
+  shell: Mysqldump --version
+  register: mysqldump_installed
+  ignore_errors: yes
+
+- name: Install Mysqldump
+  yum:
+    name: mysqldump
+    update_cache: yes
+  become: yes
+  when: mysqldump_installed.stderr != "" and ansible_distribution == "CentOS"
+
+- name: Install Mysqldump
+  apt:
+    name: mysqldump
+    update_cache: yes
+  become: yes
+  when: mysqldump_installed.stderr != "" and ansible_distribution == "Ubuntu"

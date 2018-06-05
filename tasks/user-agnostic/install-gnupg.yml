@@ -1,0 +1,16 @@
+---
+
+- name: Check if GnuPG is installed
+  shell: gpg --version
+  register: gnupg_installed
+  ignore_errors: yes
+
+- name: Install gnupg
+  apt:
+    name: gnupg
+  when: ansible_distribution == "Ubuntu"
+
+- name: Install gnupg
+  yum:
+    name: gnupg
+  when: ansible_distribution == "CentOS"

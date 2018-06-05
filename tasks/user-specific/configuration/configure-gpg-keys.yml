@@ -1,0 +1,25 @@
+---
+
+# GnuPG key pair
+
+- name: Copy GPG public key
+  copy:
+    content: "{{ install_easy_system_cloning.public_gpg_key }}"
+    dest: /tmp/public_gpg_key.gpg
+    mode: 0700
+
+- name: Copy GPG secret key
+  copy:
+    content: "{{ install_easy_system_cloning.secret_gpg_key  }}"
+    dest: /tmp/secret_gpg_key.gpg
+    mode: 0700
+
+- name: Install GPG public key
+  shell: gpg --ignore-time-conflict --import public_gpg_key.gpg
+    chdir=/tmp
+  ignore_errors: yes
+
+- name: Install GPG secret key
+  shell: gpg --ignore-time-conflict --allow-secret-key-import --batch --import secret_gpg_key.gpg
+    chdir=/tmp
+  ignore_errors: yes

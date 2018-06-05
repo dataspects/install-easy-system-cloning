@@ -1,0 +1,14 @@
+#!/bin/bash
+
+database-snapshot.sh
+
+export ENCRYPT_KEY=
+export PASSPHRASE=
+
+export SOURCE=/var/www/html/m/
+export DESTINATION="file://"
+
+export DAILYLOGFILE=/var/log/duplicity/backup.daily.log
+
+duplicity --full-if-older-than 1W -v9 --encrypt-key ${ENCRYPT_KEY} \
+  ${SOURCE} ${DESTINATION} >> ${DAILYLOGFILE}

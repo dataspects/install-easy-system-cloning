@@ -1,0 +1,102 @@
+---
+
+# https://www.digitalocean.com/community/tutorials/how-to-install-dropbox-client-as-a-service-on-ubuntu-14-04
+# https://www.digitalocean.com/community/tutorials/how-to-install-dropbox-client-as-a-service-on-centos-7
+
+
+# Install Dropbox Client
+########################
+
+- name: Create directory /opt/dropbox
+  file:
+    path: /opt/dropbox
+    state: directory
+    mode: 0755
+  become: yes
+
+- name: Unarchive Dropbox daemon
+  unarchive:
+    src: https://www.dropbox.com/download?plat=lnx.x86_64
+    dest: /opt/dropbox
+    extra_opts: [--strip-components=1]
+    remote_src: yes
+  become: yes
+
+# Set Up Service Script
+#######################
+
+- name: Download Service Script
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ item.dest }}"
+    mode: 0700
+  loop:
+    - { url: "https://gist.githubusercontent.com/thisismitch/6293d3f7f5fa37ca6eab/raw/2b326bf77368cbe5d01af21c623cd4dd75528c3d/dropbox", dest: "/etc/init.d/dropbox" }
+    - { url: "https://gist.githubusercontent.com/thisismitch/6293d3f7f5fa37ca6eab/raw/99947e2ef986492fecbe1b7bfbaa303fefc42a62/dropbox.service", dest: "/etc/systemd/system/dropbox.service" }
+  become: yes
+  when: ansible_distribution == "CentOS"
+
+- name: Install Service Script
+  template:
+    src: templates/ubuntu.dropbox.service.j2
+    dest: /etc/systemd/system/dropbox.service
+    mode: 0700
+  become: yes
+  when: ansible_distribution == "Ubuntu"
+
+#######################
+
+- name: Specify DROPBOX_USERS
+  lineinfile:
+    path: /etc/sysconfig/dropbox
+    line: 'DROPBOX_USERS="{{ ansible_env.USER }}"'
+    create: yes
+  become: yes
+  when: ansible_distribution == "CentOS"
+
+- name: Specify DROPBOX_USERS
+  lineinfile:
+    path: /etc/default/dropbox
+    line: 'DROPBOX_USERS="{{ ansible_env.USER }}"'
+    create: yes
+  become: yes
+  when: ansible_distribution == "Ubuntu"
+
+#######################
+
+- name: Reload daemon
+  systemd:
+    daemon_reload: yes
+  become: yes
+
+#######################
+
+- name: Start Dropbox daemon
+  systemd:
+    name: dropbox
+    state: started
+  become: yes
+
+# Install Dropbox CLI
+#####################
+
+# Fails for Ubuntu 14.04!
+- name: Download script
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ item.dest }}"
+    mode: 0700
+    validate_certs: no
+  loop:
+    - { url: "https://www.dropbox.com/download?dl=packages/dropbox.py", dest: "{{ ansible_env.HOME }}/dropbox.py" }
+
+- name: Make symbolic link
+  file:
+    src: /opt/dropbox
+    dest: "{{ ansible_env.HOME }}/.dropbox-dist"
+    state: link
+
+# CONNECT TO SERVER DISABLING XFORWARDING! See https://smw-cindykate.com/main/Component1753181501
+# [sherman@localhost ~]$ ./dropbox.py start
+#   To link this computer to a dropbox account, visit the following url:
+#   https://www.dropbox.com/cli_link_nonce?nonce=a66eb8083fc6c35f8da296ff26c95...

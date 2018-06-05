@@ -1,0 +1,5 @@
+- name: Install database-snapshot.sh
+  template:
+    src: templates/database-snapshot.sh.j2
+    dest: {{ ansible_env.USER }}/database-snapshot.sh
+    mode: 0700
